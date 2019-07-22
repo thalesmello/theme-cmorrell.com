@@ -1,5 +1,3 @@
-set -g pad " "
-
 ## Function to show a segment
 function prompt_segment -d "Function to show a segment"
   # Get colors
@@ -20,12 +18,10 @@ end
 function show_status -d "Function to show the current status"
   if [ $RETVAL -ne 0 ]
     prompt_segment red white " ▲ "
-    set pad ""
     end
   if [ -n "$SSH_CLIENT" ]
       prompt_segment blue white " SSH: "
-      set pad ""
-    end
+  end
 end
 
 function show_virtualenv -d "Show active python virtual environments"
@@ -37,7 +33,7 @@ end
 
 ## Show user if not in default users
 function show_user -d "Show user"
-  prompt_segment normal yellow " "
+  prompt_segment normal yellow ""
   if not contains $USER $default_user; or test -n "$SSH_CLIENT"
     set -l host (hostname -s)
     set -l who (whoami)
@@ -47,7 +43,6 @@ function show_user -d "Show user"
     if [ "$USER" != "$HOST" ]
       prompt_segment normal white "@"
       prompt_segment normal green "$host "
-      set pad ""
     end
   end
 end
@@ -66,7 +61,7 @@ function show_pwd -d "Show the current directory"
   else
     set pwd (prompt_pwd)
   end
-  prompt_segment normal blue "$pad$pwd "
+  prompt_segment normal blue " $pwd "
 end
 
 # Show prompt w/ privilege cue
