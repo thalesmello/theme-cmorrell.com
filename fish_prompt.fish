@@ -37,6 +37,7 @@ end
 
 ## Show user if not in default users
 function show_user -d "Show user"
+  prompt_segment normal yellow " "
   if not contains $USER $default_user; or test -n "$SSH_CLIENT"
     set -l host (hostname -s)
     set -l who (whoami)
