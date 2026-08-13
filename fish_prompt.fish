@@ -27,14 +27,26 @@ end
 ## Show user if not in default users
 function show_user -d "Show user"
   prompt_segment normal yellow ""
-  if not contains $USER $default_user; or test -n "$SSH_CLIENT"
-    set -l host (hostname -s)
-    set -l who (whoami)
-    prompt_segment normal yellow " $who"
+  # Narrow terminals (split panes) can't afford user@host: once the prompt is
+  # as wide as the terminal, fish truncates it and repaints the whole prompt on
+  # every keystroke instead of updating in place.
+  if set -q COLUMNS; and test $COLUMNS -lt 80
+    return
+  end
 
-    # Skip @ bit if hostname == username
-    if [ "$USER" != "$HOST" ]
-      prompt_segment normal white "@"
+  if not contains $USER $default_user; or test -n "$SSH_CLIENT"
+    # Each half is only worth the space when it carries information: the name
+    # when it isn't the default user, the host when we're remote. The @ always
+    # stays, so `root@` and `@devserver` still read as user/host.
+    set -l who (whoami)
+    contains $USER $default_user; and set who ""
+
+    set -l host ""
+    test -n "$SSH_CLIENT"; and set host (hostname -s)
+
+    prompt_segment normal yellow " $who"
+    prompt_segment normal white "@"
+    if [ -n "$host" ]
       prompt_segment normal green "$host "
     end
   end
